@@ -1,0 +1,90 @@
+<script>
+$(document).ready(function() {
+    $('.datepicker_from_update_buy')
+        .datepicker({
+            format: 'yyyy-mm-dd'
+        })
+        .on('changeDate', function(e) {
+            // Revalidate the date field
+            $('#edit_buy_take_discount').formValidation('revalidateField', 'discount_from');
+        });
+    $('.datepicker_to_update_buy')
+        .datepicker({
+            format: 'yyyy-mm-dd'
+        })
+        .on('changeDate', function(e) {
+            // Revalidate the date field
+            $('#edit_buy_take_discount').formValidation('revalidateField', 'discount_to');
+        });
+    $('#edit_buy_take_discount').formValidation({
+        framework: 'bootstrap',
+        icon: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            bt_buy_num: {
+                validators: {
+                    notEmpty: {
+                        message: 'This field is required'
+                    },
+                    numeric: {
+                        message: 'This field must be a number'
+                    }
+
+                }
+            },
+            bt_get_num: {
+                validators: {
+                    notEmpty: {
+                        message: 'This field is required'
+                    },
+                    numeric: {
+                        message: 'This field must be a number'
+                    }
+
+                }
+            },
+            bt_cat: {
+                validators: {
+                    notEmpty: {
+                        message: 'This field is required'
+                    },
+
+                }
+            },
+            bt_subcat: {
+                validators: {
+                    notEmpty: {
+                        message: 'This field is required'
+                    },
+
+                }
+            },
+            bt_sel_item: {
+                validators: {
+                    notEmpty: {
+                        message: 'This field is required'
+                    },
+
+                }
+            },
+            discount_from: {
+                validators: {
+                    notEmpty: {
+                        message: 'The Discount From is required'
+                    }
+                }
+            },
+            discount_to: {
+                validators: {
+                    notEmpty: {
+                        message: 'The Discount To is required'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
