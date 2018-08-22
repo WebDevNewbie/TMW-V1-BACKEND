@@ -50,9 +50,9 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'root';
-$db['default']['password'] = 'Az@za2015';
-$db['default']['database'] = 'pos_db';
-$db['default']['dbdriver'] = 'mysql';
+$db['default']['password'] = '';
+$db['default']['database'] = 'tradeapp';
+$db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
 $db['default']['db_debug'] = TRUE;

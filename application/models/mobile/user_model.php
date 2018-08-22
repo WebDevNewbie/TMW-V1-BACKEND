@@ -24,8 +24,9 @@ class user_model extends MY_Model
             if(count($user))
             {
                 $data = array(
-                    'user_id'        => $user->user_id,
-                    'username'  => $user->username
+                    'user_id'   => $user->user_id,
+                    'username'  => $user->username,
+                    'user_role'  => $user->user_role,
                 );
                 return $data;
             }
