@@ -32,7 +32,29 @@ class user_model extends MY_Model
             }
         }
     }
-	
+	public function getUserData($login_data){
+		if($login_data['_system_secret'] === $login_data['_login_secret'])
+        {
+            $user = $this->get_by(array(
+                'user_id' => $login_data['user_id']
+            ), TRUE);
+
+            if(count($user))
+            {
+                $data = array(
+                    'user_id'   => $user->user_id,
+                    'username'  => $user->username,
+                    'user_role'  => $user->user_role,
+                    'first_name'  => $user->first_name,
+                    'last_name'  => $user->last_name,
+                    'age'  => $user->age,
+                    'birthday'  => $user->birthday,
+                    'address'  => $user->address,
+                );
+                return $data;
+            }
+        }
+	}
 	public function chckUsername($username){
 		$query = $this->db->get_where('users', array('username' => $username));
 		if ($query->num_rows() > 0)
