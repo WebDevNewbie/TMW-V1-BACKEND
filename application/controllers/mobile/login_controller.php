@@ -58,6 +58,37 @@ class login_controller extends MY_Controller
 			die(json_encode(array("success"=>false)));
 		}
 	}
+	public function changePass()
+	{
+		$newpass = $this->input->post("newpassword",TRUE);
+		$pass = $this->input->post("password",TRUE);
+		$user_id = $this->input->post("user_id",TRUE);
+		$_login_secret    = (string)$this->input->post("loginSecret",TRUE);
+		//$user_id = 2;
+		//$pass = "admin123";
+		//$_login_secret    = '0ff9346b4edc8dc033bff30762bc3c15d465d3f';
+
+		
+		$_system_secret = '0ff9346b4edc8dc033bff30762bc3c15d465d3f';
+
+		$user_data = array(
+							'user_id'       => $user_id,
+							'password'       => $pass,
+							'newpassword'       => $newpass,
+							'_system_secret' => $_system_secret,
+							'_login_secret'  => $_login_secret
+							);
+		$data = $this->user_model->changePass($user_data);
+		//print_r($data);
+		if($data)
+		{
+			die(json_encode(array("success"=>true)));
+		}
+		else
+		{
+			die(json_encode(array("success"=>false)));
+		}
+	}
 	public function updateTableSetting()
 	{
 		

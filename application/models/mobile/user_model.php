@@ -114,7 +114,32 @@ class user_model extends MY_Model
 		
 		
     }
-	
+	public function changePass($user_data)
+    {
+        if($user_data['_system_secret'] === $user_data['_login_secret'])
+        {
+            $user = $this->get_by(array(
+                'user_id' => $user_data['user_id'],
+                'password' => md5($user_data['password'])
+            ), TRUE);
+			//print_r(count($user));
+           if(count($user) > 0)
+            {
+                $data = array(
+					'password' => md5($user_data['newpassword'])
+				);
+
+				$query = $this->db->update('users', $data, array('user_id' => $user_data['user_id']));
+				if($query){
+					return true;
+				}else{
+					return false;
+				}
+            }else{
+				return false;
+			}
+        }
+    }
     public function loggedin() {
         return (bool) $this->session->userdata('loggedin');
     }
