@@ -42,7 +42,20 @@ class user_controller extends MY_Controller
 			die(json_encode(array("success"=>false, "user_data"=>NULL)));
 		}
 	}
-	
+	public function updateUser()
+	{
+		$data = $this->user_model->updateUser();
+		
+		
+		if($data)
+		{
+			die(json_encode(array("success"=>true)));
+		}
+		else
+		{
+			die(json_encode(array("success"=>false)));
+		}
+	}
 	public function getUserData()
 	{
 		$userID      = $this->input->post("userID",TRUE);
