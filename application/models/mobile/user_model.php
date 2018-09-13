@@ -57,6 +57,8 @@ class user_model extends MY_Model
 	public function addUser()
     {
 		
+		$servicename = $this->input->post("servicename",TRUE);
+		$servicedesc = $this->input->post("servicedesc",TRUE);
 		$userName = $this->input->post("username",TRUE);
 		$password = $this->input->post("password",TRUE);
 		$fname = $this->input->post("fname",TRUE);
@@ -72,11 +74,13 @@ class user_model extends MY_Model
 		$data = array(
 							'username'		=> $userName,
 							'password'      => md5($password),
-							'first_name'		=> $fname,
+							'first_name'	=> $fname,
 							'last_name'		=> $lname,
-							'age'		=> $age,
+							'age'			=> $age,
 							'birthday'		=> $bday,
 							'address'		=> $address,
+							'service_name'	=> $servicename,
+							'service_desc'	=> $servicedesc,
 							'user_role' 	=> $user_role
 							);
 
@@ -94,6 +98,8 @@ class user_model extends MY_Model
     {
 		
 		$user_id = $this->input->post("user_id",TRUE);
+		$servname = $this->input->post("servname",TRUE);
+		$servdesc = $this->input->post("servdesc",TRUE);
 		$fname = $this->input->post("fname",TRUE);
 		$lname = $this->input->post("lname",TRUE);
 		$age = $this->input->post("age",TRUE);
@@ -126,6 +132,8 @@ class user_model extends MY_Model
 			$data = array(
 				'first_name'		=> $fname,
 				'last_name'			=> $lname,
+				'service_name'		=> $servname,
+				'service_desc'		=> $servdesc,
 				'age'				=> $age,
 				'birthday'			=> $bday,
 				'address'			=> $address,
