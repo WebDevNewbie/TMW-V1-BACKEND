@@ -34,7 +34,7 @@ class login_controller extends MY_Controller
 
 		$data = $this->user_model->logIn($login_data);
 
-		if(count($data) > 0)
+		if($data != false)
 		{
 			die(json_encode(array("success"=>true,"user_info"=>$data)));
 		}

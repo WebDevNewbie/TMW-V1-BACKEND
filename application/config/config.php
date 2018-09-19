@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-function __autoload($classname)
+function __autoload_flourish($classname)
 {
 	if(strpos($classname, 'CI_') !==0)
 	{
@@ -8,9 +8,12 @@ function __autoload($classname)
 		if(file_exists($file) && is_file($file))
 		{
 			@include_once($file);
-		}
+		}	
 	}
 }
+
+// fix for autoload error - 09/16/18
+spl_autoload_register('__autoload_flourish');
 /*
 |--------------------------------------------------------------------------
 | Base Site URL

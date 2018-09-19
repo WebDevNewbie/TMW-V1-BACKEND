@@ -72,7 +72,7 @@ class user_controller extends MY_Controller
 
 		$data = $this->user_model->getUserData($login_data);
 
-		if(count($data) > 0)
+		if($data != false)
 		{
 			die(json_encode(array("success"=>true,"user_info"=>$data)));
 		}
@@ -81,6 +81,20 @@ class user_controller extends MY_Controller
 			die(json_encode(array("success"=>false,"user_info"=>null)));
 		}
 	}
+
+	public function startSearch(){
+		$sk  = $this->input->post("search",TRUE);
+		$data = $this->user_model->search($sk);
+
+		if($data != false){
+			die(json_encode(array("success"=>true,"search_result"=>$data)));
+		}else{
+			die(json_encode(array("error"=>true,"search_result"=>$data)));
+		}
+
+	}
+
+	
 	
 }
 

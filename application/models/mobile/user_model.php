@@ -16,20 +16,40 @@ class user_model extends MY_Model
     {
         if($login_data['_system_secret'] === $login_data['_login_secret'])
         {
-            $user = $this->get_by(array(
-                'username' => $login_data['username'],
-                'password' => md5($login_data['password']),
-            ), TRUE);
+            // $user = $this->get_by(array(
+            //     'username' => $login_data['username'],
+            //     'password' => md5($login_data['password']),
+            // ), TRUE);
 
-            if(count($user))
-            {
-                $data = array(
-                    'user_id'   => $user->user_id,
-                    'username'  => $user->username,
-                    'user_role'  => $user->user_role,
-                );
-                return $data;
-            }
+            // if(count($user))
+            // {
+            //     $data = array(	
+            //         'user_id'   => $user->user_id,
+            //         'username'  => $user->username,
+            //         'user_role'  => $user->user_role,
+            //     );
+            //     return $data;
+            // } else {
+            // 	return false;
+            // }
+            $this->db->select('*');
+			$this->db->where('username', $login_data['username']);
+			$this->db->where('password', md5($login_data['password']));
+			$query = $this->db->get('users');
+			if($query->num_rows()){
+				foreach ($query->result() as $row)
+				{
+					$data = array(	
+	                    'user_id'   => $row->user_id,
+	                    'username'  => $row->username,
+	                    'user_role'  => $row->user_role,
+	                );
+				}
+				return $data;
+			} else {
+				return false;
+			}
+			
         }
     }
 	public function getUserData($login_data){
@@ -39,10 +59,20 @@ class user_model extends MY_Model
                 'user_id' => $login_data['user_id']
             ), TRUE);
 
-            if(count($user))
+            if($user)
             {
                 return $user;
+            } else {
+            	return false;
             }
+   //          $this->db->select('*');
+			// $this->db->where('user_id', $login_data['user_id']);
+			// $query = $this->db->get('users');
+			// if($query->num_rows()){
+			// 	return $query->result();
+			// } else {
+			// 	return false;
+			// }
         }
 	}
 	public function chckUsername($username){
@@ -212,6 +242,26 @@ class user_model extends MY_Model
     }
     public function hash($string) {
         return hash('sha512', $string . config_item('encryption_key'));
+    }
+
+    public function search($sk){
+
+    	$query = $this->db->query("SELECT user_id, service_name, service_desc,address FROM users WHERE service_name LIKE '%$sk%' ");
+    	if($query->num_rows()){
+			return $query->result();
+    	} else {
+    		return false;
+    	}
+
+    }
+
+    public function viewTraderdata($traderID){
+    	$query = $this->db->query("SELECT * FROM users WHERE user_id = '$traderID'");
+    	if($query->num_rows()){
+			return $query->result();
+    	} else {
+    		return false;
+    	}
     }
 
 } #end of Class
