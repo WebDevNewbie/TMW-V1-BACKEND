@@ -116,11 +116,19 @@ class user_model extends MY_Model
 
         if($_login_secret === $_system_secret)
         {
-			$this->db->insert('users', $data); 
-			if($this->db->affected_rows() > 0)
+			$this->db->insert('users', $data);
+
+			if($this->db->affected_rows() > 0):
+				define('MAIN_DIR','MediaFiles/');
+				$imageDir = 'Images';
+				$userholder = $this->db->insert_id();
+
+				mkdir(MAIN_DIR.$userholder.'/Images',0777,true);
+				mkdir(MAIN_DIR.$userholder.'/Videos',0777,true);
 				return $this->db->insert_id();
-			else
+			else:
 				return 0; 
+			endif;
 			
         }
     }

@@ -4,8 +4,11 @@ class login_controller extends MY_Controller
 {
 	public function __construct() {
 		parent::__construct();
-		header('Access-Control-Allow-Origin: *'); 
-		header('Access-Control-Allow-Headers: content-type'); 
+		// header('Access-Control-Allow-Origin: *'); 
+		// header('Access-Control-Allow-Headers: content-type'); 
+		header('Access-Control-Allow-Origin: *');
+		header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+		header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, X-Requested-With");
 		$this->load->model("mobile/user_model");
 	}
 
