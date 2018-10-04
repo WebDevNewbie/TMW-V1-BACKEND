@@ -272,6 +272,25 @@ class user_model extends MY_Model
     	}
     }
 
+    public function loadImages($traderID){
+    	$query = $this->db->query("SELECT * FROM imagefiles WHERE user_id = '$traderID'");
+    	if($query->num_rows()){
+			return $query->result();
+    	} else {
+    		return false;
+    	}
+    }
+
+    public function saveFile($table,$user_id,$filename){
+    	$data = array(
+    		'user_id'		=> $user_id,
+			'file_name'		=> $filename	
+		);
+    	$this->db->insert($table, $data);
+    }
+
+
+
 } #end of Class
 
 
