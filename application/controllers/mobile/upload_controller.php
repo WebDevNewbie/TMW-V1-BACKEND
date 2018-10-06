@@ -9,14 +9,7 @@ class upload_controller extends MY_Controller
 		$this->load->model("mobile/user_model");
 	}
 
-	public function upload_file(){
-
-		// $json    =  file_get_contents('php://input');
-		// $obj     =  json_decode($json,true);
-		// $key = $obj['key'];
-		// $encoded_string = $obj['base64'];
-		// $folder = $obj['folder'];
-		// $userHolder = $obj['user_id'];
+	public function upload_image(){
 		
 		$_login_secret    = (string)$this->input->post("loginSecret",TRUE);
 		$encoded_string = $this->input->post("base64",TRUE);
@@ -50,7 +43,7 @@ class upload_controller extends MY_Controller
 	}
 
 	public function mimeTotext($mime){
-		$all_mimes = '{"jpeg":["image\/jpeg","image\/p-jpeg"],"3gpp":["video\/3gpp"],"mp4":["video\/mp4"],"3gpp":["video\/3gpp"]}';
+		$all_mimes = '{"jpeg":["image\/jpeg","image\/p-jpeg"],"3gp":["video\/3gp"],"mp4":["video\/mp4"]}';
 		$all_mimes = json_decode($all_mimes,true);
 		foreach($all_mimes as $key => $value){
 			if(array_search($mime,$value) !== false ) return $key;
@@ -58,18 +51,19 @@ class upload_controller extends MY_Controller
 		return false;
 	}
 
-	public function initSaveFile($user_id,$file,$folder){
-
-		if($folder == 'Images'){
-
-			$table = 'imagefiles';
-
-		}else{
-			$table = 'videofiles';
+	public function upload_video(){
+		$user_id = $this->input->post('user');
+		$target_path = $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/'.$user_id.'/Videos/'. basename( $_FILES['file']['name']);
+		  
+		if (move_uploaded_file($_FILES['file']['tmp_name'],$target_path)) {
+			$table = "videofiles";
+			$this->user_model->saveFile($table,$user_id,$_FILES['file']['name']);
+		    echo "Trade Video upload success!";
+		} else {
+			echo $target_path;
+		    echo "There was an error uploading the file, please try again!";
 		}
-		
 	}	
-	
 }
 
 ?>
