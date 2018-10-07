@@ -22,7 +22,7 @@ class upload_controller extends MY_Controller
 		$extension = $this->mimeTotext($mime_type);
 		
 		$file = uniqid() .'.'. $extension;
-		$file_dir = MAIN_DIR . $userHolder .'/'.$folder.'/' . uniqid() .'.'. $extension;
+		$file_dir = MAIN_DIR . $userHolder .'/'.$folder.'/' . $file;
 		if($folder == 'Images'){
 			$typeOfFile = 'Image';
 			$table = 'imagefiles';
