@@ -273,9 +273,18 @@ class user_model extends MY_Model
     }
 
     public function loadImages($traderID){
-    	$query = $this->db->query("SELECT * FROM imagefiles WHERE user_id = '$traderID'");
+    	
+    	$query = $this->db->query("SELECT * FROM imagefiles WHERE user_id = '$traderID' ORDER BY dateadded DESC");
     	if($query->num_rows()){
-			return $query->result();
+			$finalImages = [];
+			foreach($query->result() as $data):
+				$initialImage = array(
+					'file_name' => $data->file_name,
+					'dateadded' => $this->get_real_time($data->dateadded)
+				);
+				array_push($finalImages,$initialImage);
+			endforeach;
+			return $finalImages;
     	} else {
     		return false;
     	}
@@ -284,10 +293,103 @@ class user_model extends MY_Model
     public function saveFile($table,$user_id,$filename){
     	$data = array(
     		'user_id'		=> $user_id,
-			'file_name'		=> $filename	
+			'file_name'		=> $filename,
+			'dateadded'		=> date('Y-m-d H:i:s')
 		);
     	$this->db->insert($table, $data);
     }
+
+    public function get_real_time($timestamp){
+
+		  $time_ago        = strtotime($timestamp);
+		  $current_time    = time();
+		  $time_difference = $current_time - $time_ago;
+		  $seconds         = $time_difference;
+		  
+		  $minutes = round($seconds / 60); // value 60 is seconds  
+		  $hours   = round($seconds / 3600); //value 3600 is 60 minutes * 60 sec  
+		  $days    = round($seconds / 86400); //86400 = 24 * 60 * 60;  
+		  $weeks   = round($seconds / 604800); // 7*24*60*60;  
+		  $months  = round($seconds / 2629440); //((365+365+365+365+366)/5/12)*24*60*60  
+		  $years   = round($seconds / 31553280); //(365+365+365+365+366)/5 * 24 * 60 * 60
+		                
+		  if ($seconds <= 60){
+
+		    return "Just Now";
+
+		  } else if ($minutes <= 60){
+
+		    if ($minutes == 1){
+
+		      return "a minute ago";
+
+		    } else {
+
+		      return "$minutes minutes ago";
+
+		    }
+
+		  } else if ($hours <= 24){
+
+		    if ($hours == 1){
+
+		      return "an hour ago";
+
+		    } else {
+
+		      return "$hours hrs ago";
+
+		    }
+
+		  } else if ($days <= 7){
+
+		    if ($days == 1){
+
+		      return "yesterday";
+
+		    } else {
+
+		      return "$days days ago";
+
+		    }
+
+		  } else if ($weeks <= 4.3){
+
+		    if ($weeks == 1){
+
+		      return "a week ago";
+
+		    } else {
+
+		      return "$weeks weeks ago";
+
+		    }
+
+		  } else if ($months <= 12){
+
+		    if ($months == 1){
+
+		      return "a month ago";
+
+		    } else {
+
+		      return "$months months ago";
+
+		    }
+
+		  } else {
+		    
+		    if ($years == 1){
+
+		      return "a year ago";
+
+		    } else {
+
+		      return "$years years ago";
+
+		    }
+		  }
+	}
 
 
 
