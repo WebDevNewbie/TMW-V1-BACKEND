@@ -65,13 +65,14 @@ class upload_controller extends MY_Controller
 		}
 	}
 
-	public function ListImages(){
+	public function ListMedia(){
 
 		$json    =  file_get_contents('php://input');
 		$obj     =  json_decode($json,true);
 		$idHolder = $obj['user_id'];
+		$table = $obj['dbTable'];
 		
-		$data = $this->user_model->loadImages($idHolder);
+		$data = $this->user_model->loadMedia($table,$idHolder);
 
 		if($data != false)
 		{
@@ -85,7 +86,6 @@ class upload_controller extends MY_Controller
 		}
 
 	}
-
 		
 }
 

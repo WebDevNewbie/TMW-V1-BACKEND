@@ -92,29 +92,7 @@ class user_controller extends MY_Controller
 			die(json_encode(array("error"=>true,"search_result"=>$data)));
 		}
 
-	}
-
-	public function ListImages(){
-
-		$json    =  file_get_contents('php://input');
-		$obj     =  json_decode($json,true);
-		$idHolder = $obj['user_id'];
-		
-		$data = $this->user_model->loadImages($idHolder);
-
-		if($data != false)
-		{
-			 die(json_encode(array("success"=>true,"file_names"=>$data)));
-
-		}
-		else
-		{
-			 die(json_encode(array("success"=>true,"file_names"=>null)));
-
-		}
-
-	}
-	
+	}	
 	
 }
 

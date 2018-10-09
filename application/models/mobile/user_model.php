@@ -53,7 +53,7 @@ class user_model extends MY_Model
         }
     }
 	public function getUserData($login_data){
-		if($login_data['_system_secret'] === $login_data['_login_secret'])
+		if($login_data ['_system_secret'] === $login_data['_login_secret'])
         {
             $user = $this->get_by(array(
                 'user_id' => $login_data['user_id']
@@ -65,14 +65,23 @@ class user_model extends MY_Model
             } else {
             	return false;
             }
-   //          $this->db->select('*');
-			// $this->db->where('user_id', $login_data['user_id']);
-			// $query = $this->db->get('users');
-			// if($query->num_rows()){
-			// 	return $query->result();
-			// } else {
-			// 	return false;
-			// }
+        }
+	}
+	public function getTraderData($login_data){
+		if($login_data ['_system_secret'] === $login_data['_login_secret'])
+        {
+        	$id = $login_data['user_id'];
+            // $user = $this->get_by(array(
+            //     'user_id' => $login_data['user_id']
+            // ), TRUE);
+            $user = $this->db->query("SELECT users.*,imagefiles.file_name,videofiles.file_name FROM users,imagefiles,videofiles WHERE imagefiles.user_id = $id AND videofiles.user_id = $id AND users.user_id = $id");
+
+           if($user->num_rows())
+            {
+                return $user->result();
+            } else {
+            	return false;
+            }
         }
 	}
 	public function chckUsername($username){
@@ -272,9 +281,9 @@ class user_model extends MY_Model
     	}
     }
 
-    public function loadImages($traderID){
+    public function loadMedia($table,$traderID){
     	
-    	$query = $this->db->query("SELECT * FROM imagefiles WHERE user_id = '$traderID' ORDER BY dateadded DESC");
+    	$query = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID' ORDER BY dateadded DESC");
     	if($query->num_rows()){
 			$finalImages = [];
 			foreach($query->result() as $data):
