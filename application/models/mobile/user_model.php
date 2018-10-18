@@ -67,18 +67,45 @@ class user_model extends MY_Model
             }
         }
 	}
-	public function getTraderData($login_data){
-		if($login_data ['_system_secret'] === $login_data['_login_secret'])
+	public function getTraderData($sk){
+		if($sk)
         {
-        	$id = $login_data['user_id'];
-            // $user = $this->get_by(array(
-            //     'user_id' => $login_data['user_id']
-            // ), TRUE);
-            $user = $this->db->query("SELECT users.*,imagefiles.file_name,videofiles.file_name FROM users,imagefiles,videofiles WHERE imagefiles.user_id = $id AND videofiles.user_id = $id AND users.user_id = $id");
-
-           if($user->num_rows())
+        	
+           
+            $user = $this->db->query("SELECT user_id, service_name, service_desc,address FROM users WHERE service_name LIKE '%$sk%' ");
+            $finalData = array();
+           if( $user->num_rows() )
             {
-                return $user->result();
+              
+               foreach ($user->result() as $data) {
+               	$user_id = $data->user_id;
+                $finalData[] =  $data;
+               	$images = $this->db->query("SELECT file_name FROM imagefiles WHERE user_id = $user_id");
+               	  if( $images->num_rows() ){
+               	  	foreach ($images->result() as $imgs):
+               	  		$img = array(
+               	  			
+               	  			'images' => $imgs->file_name
+               	  					
+               	  		);
+               	  		array_merge($finalData,$img);
+               	  		
+               	  	endforeach;
+               	  }
+	               	$video = $this->db->query("SELECT file_name FROM videofiles WHERE user_id = $user_id");
+	               	if( $video->num_rows() ){
+	               	  	foreach ($video->result() as $vids):
+	               	  		$vid = array(
+	               	  			
+	               	  			'videos' => $vids->file_name
+	               	  		
+	               	  		);
+	               	  		array_merge($finalData,$vid);
+
+	               	  	endforeach;
+	               	}
+               }
+               return $finalData;
             } else {
             	return false;
             }
@@ -288,6 +315,7 @@ class user_model extends MY_Model
 			$finalImages = [];
 			foreach($query->result() as $data):
 				$initialImage = array(
+					'id'		=> $data->id,
 					'file_name' => $data->file_name,
 					'dateadded' => $this->get_real_time($data->dateadded)
 				);
@@ -306,6 +334,10 @@ class user_model extends MY_Model
 			'dateadded'		=> date('Y-m-d H:i:s')
 		);
     	$this->db->insert($table, $data);
+    }
+
+    public function deleteFile($table,$img_id){
+    	$this->db->delete($table, array('id' => $img_id));
     }
 
     public function get_real_time($timestamp){

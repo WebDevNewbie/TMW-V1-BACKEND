@@ -32,11 +32,11 @@ class upload_controller extends MY_Controller
 		}
 		try {
 			file_put_contents($file_dir, $decoded_file);
-			header('Content-Type: application/json');
+			//header('Content-Type: application/json');
 			$this->user_model->saveFile($table,$userHolder,$file);
 			echo json_encode(array("success" => true, "message" => "Trade $typeOfFile successfully Uploaded")); 
 		} catch (Exception $e) {
-			header('Content-Type: application/json');
+			//header('Content-Type: application/json');
 			echo json_encode(array("success" => false, "message" => $e->getMessage())); 
 		}
 
@@ -65,12 +65,36 @@ class upload_controller extends MY_Controller
 		}
 	}
 
+	public function deleteMedia(){
+		
+		$user_id = $this->input->post('user_id');
+		$storage = $this->input->post('storage');
+		$filename = $this->input->post('filename');
+		$table = $this->input->post('dbTable');
+		$imgID = $this->input->post('img_id');
+		$target_path = $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/'.$user_id.'/'.$storage.'/'. $filename;
+	  	if($storage == 'Images'){
+	  		//echo "Trade image successfully deleted!";
+	  		unlink($target_path);
+	  		$this->user_model->deleteFile($table,$imgID);
+	  		echo json_encode(array("success" => true, "message" => "Trade image successfully deleted!"));
+	  	} else {
+	  		unlink($target_path);
+	  		$this->user_model->deleteFile($table,$imgID);
+	  		echo json_encode(array("success" => true, "message" => "Trade video successfully deleted!"));
+	  		//echo "Trade video successfully deleted!";
+	  	}
+	
+	}
+
 	public function ListMedia(){
 
-		$json    =  file_get_contents('php://input');
-		$obj     =  json_decode($json,true);
-		$idHolder = $obj['user_id'];
-		$table = $obj['dbTable'];
+		// $json    =  file_get_contents('php://input');
+		// $obj     =  json_decode($json,true);
+		// $idHolder = $obj['user_id'];
+		// $table = $obj['dbTable'];
+		$idHolder = $this->input->post('user_id');
+		$table = $this->input->post('dbTable');
 		
 		$data = $this->user_model->loadMedia($table,$idHolder);
 
