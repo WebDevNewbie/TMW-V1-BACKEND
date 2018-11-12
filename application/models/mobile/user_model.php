@@ -16,22 +16,7 @@ class user_model extends MY_Model
     {
         if($login_data['_system_secret'] === $login_data['_login_secret'])
         {
-            // $user = $this->get_by(array(
-            //     'username' => $login_data['username'],
-            //     'password' => md5($login_data['password']),
-            // ), TRUE);
 
-            // if(count($user))
-            // {
-            //     $data = array(	
-            //         'user_id'   => $user->user_id,
-            //         'username'  => $user->username,
-            //         'user_role'  => $user->user_role,
-            //     );
-            //     return $data;
-            // } else {
-            // 	return false;
-            // }
             $this->db->select('*');
 			$this->db->where('username', $login_data['username']);
 			$this->db->where('password', md5($login_data['password']));
@@ -338,6 +323,115 @@ class user_model extends MY_Model
 
     public function deleteFile($table,$img_id){
     	$this->db->delete($table, array('id' => $img_id));
+    }
+
+    public function sendMessage($fromTrader,$toTrader,$message){
+    	$data = array(
+    		'from_trader'		=> $fromTrader,
+			'to_trader'		=> $toTrader,
+			'message'		=> $message,
+			'datesent'		=> date('Y-m-d H:i:s'),
+			'status'			=> 0
+		);
+
+    	$this->db->insert('chat_messages', $data);
+    }
+
+    public function fetchChatMessages($fromTrader,$toTrader){
+    	$query = $this->db->query("SELECT user_id, username, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE (o.from_trader = '$fromTrader' AND o.to_trader = '$toTrader') OR (o.from_trader = '$toTrader' AND o.to_trader = '$fromTrader') ORDER BY datesent DESC");
+    	if($query->num_rows()){
+    		$finalChats = [];
+    		foreach($query->result() as $data):
+				$initialChats = array(
+					'username' => $data->username,
+					'message'  => $data->message
+				);
+				array_push($finalChats,$initialChats);
+			endforeach;
+			$this->seen_messages($fromTrader,$toTrader);
+			return $finalChats;
+    	} else {
+    		return false;
+    	}
+    	
+    }
+
+    public function get_retrieved_message($logged_id){
+		
+		$message = $this->db->query("SELECT id,username, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE o.to_trader = '$logged_id' AND status = 0 ORDER BY o.id DESC LIMIT 1");
+    	
+    	if($message->num_rows()){
+    		$finalMessage = [];
+    		foreach($message->result() as $data):
+				$initialMessage = array(
+					'chat_id'  => $data->id,
+					'username' => $data->username,
+					'message'  => $data->message
+				);
+				array_push($finalMessage,$initialMessage);
+			endforeach;
+			return $finalMessage;
+    	} else {
+    		return false;
+    	}
+   
+    }
+
+    public function update_retrieved_message($chatID){
+    	$query = $this->db->query("UPDATE chat_messages SET status = 1 WHERE id = '$chatID' ");
+    	if($query){
+    		return true;
+    	} else {
+    		return false;
+    	}
+    }
+
+
+    public function get_latest_message($fromTrader,$toTrader){
+    	$query = $this->db->query("SELECT user_id, username, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE (o.from_trader = '$fromTrader' AND o.to_trader = '$toTrader') OR (o.from_trader = '$toTrader' AND o.to_trader = '$fromTrader') ORDER BY datesent DESC LIMIT 1");
+    	if($query->num_rows()){
+    		return $query->result();
+    	} else {
+    		return false;
+    	}
+    }
+
+    public function all_unseen_messages($loggedInid){
+    	$query = $this->db->query("SELECT * FROM chat_messages where to_trader = '$loggedInid' AND status = 0");
+    	$rowcount = $query->num_rows();
+    	return $rowcount;
+    }
+
+    public function seen_messages($fromTrader,$toTrader){
+    	$query = $this->db->query("UPDATE chat_messages SET status = 1 WHERE from_trader = '$toTrader' AND to_trader = '$fromTrader' AND status = 0");
+    }
+
+    public function all_connections($loggedInid){
+    	$query = $this->db->query("SELECT DISTINCT from_trader FROM chat_messages WHERE to_trader = '$loggedInid'");
+    	$finalNames = [];
+    	if($query->num_rows()){
+			foreach($query->result() as $data):
+				$fromID = $data->from_trader;
+				$get = $this->db->query("SELECT user_id,username FROM users WHERE user_id = '$fromID'");
+				foreach ($get->result() as $names) {
+					$sender = $names->user_id;
+					$chat_count = $this->db->query("SELECT * FROM chat_messages WHERE from_trader = '$sender' AND to_trader = '$loggedInid' AND status = 0");
+					$unseen_count = $chat_count->num_rows();
+					$get_last_message = $this->db->query("SELECT message FROM chat_messages WHERE from_trader = '$sender' AND to_trader = '$loggedInid' ORDER BY datesent DESC LIMIT 1 ");
+					$last_message = $get_last_message->result()[0]->message;
+					$initialNames = array(
+						'user_id'	=> $names->user_id,
+						'username' => $names->username,
+						'unseen_chat' =>$unseen_count,
+						'last_message' => $last_message
+					);
+					array_push($finalNames,$initialNames);
+				}
+			endforeach;
+			return $finalNames;
+    	} else {
+    		return false;
+    	}
     }
 
     public function get_real_time($timestamp){
