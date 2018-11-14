@@ -49,18 +49,6 @@ class chat_controller extends MY_Controller
 		}
 	}
 
-	// public function latest_chat_message(){
-	// 	$fromTrader = $this->input->post('fromTrader');
-	// 	$chat_id = $this->input->post('chat_id');
-	// 	//$toTrader = $this->input->post('toTrader');
-	// 	$data = $this->user_model->get_retrieved_message($fromTrader,$chat_id);
-	// 	if($data != false){
-	// 		die(json_encode(array("success"=>true,"new_message"=>$data)));
-	// 	}else{
-	// 		die(json_encode(array("success"=>true,"new_message"=>null)));
-	// 	}
-	// }
-
 	public function update_latest_message(){
 		$chat_id = $this->input->post('chat_id');
 		

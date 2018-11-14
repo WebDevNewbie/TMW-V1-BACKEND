@@ -296,19 +296,23 @@ class user_model extends MY_Model
     public function loadMedia($table,$traderID){
     	
     	$query = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID' ORDER BY dateadded DESC");
+    	$img = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID'");
+    	
     	if($query->num_rows()){
+
 			$finalImages = [];
 			foreach($query->result() as $data):
 				$initialImage = array(
 					'id'		=> $data->id,
 					'file_name' => $data->file_name,
-					'dateadded' => $this->get_real_time($data->dateadded)
+					'dateadded' => $this->get_real_time($data->dateadded),
+					'imgCount' => $img->num_rows()
 				);
 				array_push($finalImages,$initialImage);
 			endforeach;
 			return $finalImages;
     	} else {
-    		return false;
+    		return $img->num_rows();
     	}
     }
 
@@ -432,6 +436,19 @@ class user_model extends MY_Model
     	} else {
     		return false;
     	}
+    }
+
+    public function count_user_uploads($logged_in){
+    	$img = $this->db->query("SELECT * FROM imagefiles where user_id = '$logged_in'");
+    	$vid = $this->db->query("SELECT * FROM videofiles where user_id = '$logged_in'");
+    	$imgCnt = $img->num_rows();
+    	$vidCnt = $vid->num_rows();
+
+    	$uploadCnt = array(
+    		'imgCount' => $imgCnt,
+    		'vidCount'	=> $vidCnt
+    	);
+    	return $uploadCnt;
     }
 
     public function get_real_time($timestamp){

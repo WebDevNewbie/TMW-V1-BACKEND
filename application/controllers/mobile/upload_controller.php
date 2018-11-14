@@ -88,24 +88,19 @@ class upload_controller extends MY_Controller
 	}
 
 	public function ListMedia(){
-
-		// $json    =  file_get_contents('php://input');
-		// $obj     =  json_decode($json,true);
-		// $idHolder = $obj['user_id'];
-		// $table = $obj['dbTable'];
 		$idHolder = $this->input->post('user_id');
 		$table = $this->input->post('dbTable');
 		
 		$data = $this->user_model->loadMedia($table,$idHolder);
 
-		if($data != false)
+		if($data != 0)
 		{
 			 die(json_encode(array("success"=>true,"file_names"=>$data)));
 
 		}
 		else
 		{
-			 die(json_encode(array("success"=>true,"file_names"=>null)));
+			 die(json_encode(array("success"=>false,"file_names"=>$data)));
 
 		}
 
