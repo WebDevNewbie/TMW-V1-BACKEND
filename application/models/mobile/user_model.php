@@ -275,7 +275,7 @@ class user_model extends MY_Model
 
     public function search($sk){
 
-    	$query = $this->db->query("SELECT user_id, service_name, service_desc,address FROM users WHERE service_name LIKE '%$sk%' ");
+    	$query = $this->db->query("SELECT user_id, service_name, first_name,last_name FROM users WHERE service_name LIKE '%$sk%' ");
     	if($query->num_rows()){
 			return $query->result();
     	} else {
