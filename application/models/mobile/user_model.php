@@ -157,6 +157,9 @@ class user_model extends MY_Model
     {
 		
 		$user_id = $this->input->post("user_id",TRUE);
+		$region = $this->input->post("region",TRUE);
+		$state = $this->input->post("state",TRUE);
+		$country = $this->input->post("country",TRUE);
 		$servname = $this->input->post("servname",TRUE);
 		$servdesc = $this->input->post("servdesc",TRUE);
 		$fname = $this->input->post("fname",TRUE);
@@ -194,6 +197,9 @@ class user_model extends MY_Model
 				'service_name'		=> $servname,
 				'service_desc'		=> $servdesc,
 				'age'				=> $age,
+				'region'			=> $region,
+				'state'				=> $state,
+				'country'			=> $country,
 				'birthday'			=> $bday,
 				'address'			=> $address,
 				'activity'			=> $activity,
