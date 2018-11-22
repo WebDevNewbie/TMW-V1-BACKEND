@@ -16,12 +16,11 @@ class chat_controller extends MY_Controller
 		$chatMessage = $this->input->post('chatMessage');
 
 		$this->user_model->sendMessage($fromTrader,$toTrader,$chatMessage);
-		
 		$data = $this->user_model->fetchChatMessages($fromTrader,$toTrader);
-		if($data != false){
+		if($data != 0){
 			die(json_encode(array("success"=>true,"chat_messages"=>$data)));
 		}else{
-			die(json_encode(array("success"=>true,"chat_messages"=>null)));
+			die(json_encode(array("success"=>false,"chat_messages"=>null)));
 		}
 		
 	}
@@ -31,10 +30,10 @@ class chat_controller extends MY_Controller
 		$toTrader = $this->input->post('toTrader');
 
 		$data = $this->user_model->fetchChatMessages($fromTrader,$toTrader);
-		if($data != false){
+		if($data != 0){
 			die(json_encode(array("success"=>true,"chat_messages"=>$data)));
 		}else{
-			die(json_encode(array("success"=>true,"chat_messages"=>null)));
+			die(json_encode(array("success"=>false,"chat_messages"=>$data)));
 		}
 	}
 
@@ -79,5 +78,7 @@ class chat_controller extends MY_Controller
 	
 		
 }
+
+
 
 ?>

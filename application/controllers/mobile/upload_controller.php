@@ -53,12 +53,18 @@ class upload_controller extends MY_Controller
 
 	public function upload_video(){
 		$user_id = $this->input->post('user');
-		$target_path = $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/'.$user_id.'/Videos/'. basename( $_FILES['file']['name']);
-		  
+		$location = $this->input->post('location');
+		$table = $this->input->post('table');
+		$target_path = $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/'.$user_id.'/'.$location.'/'. basename( $_FILES['file']['name']);
+		if($table == "videofile"){
+			$type = 'Trade Video';
+		}else{
+			$type = 'Promotion Video';
+		}
 		if (move_uploaded_file($_FILES['file']['tmp_name'],$target_path)) {
-			$table = "videofiles";
+			
 			$this->user_model->saveFile($table,$user_id,$_FILES['file']['name']);
-		    echo "Trade Video upload success!";
+		    echo $type . " upload success!";
 		} else {
 			echo $target_path;
 		    echo "There was an error uploading the file, please try again!";
@@ -104,6 +110,18 @@ class upload_controller extends MY_Controller
 
 		}
 
+	}
+
+	public function promotionVideostatus(){
+
+		$user_id = $this->input->post('user_id');
+		$promotion_id = $this->input->post('promotion_id');
+		$trigger = $this->input->post('Trigger');
+
+		$this->user_model->promotionStatus($user_id,$promotion_id,$trigger);
+	  	echo json_encode(array("success" => true, "message" => "SUCCESS"));
+
+	
 	}
 		
 }

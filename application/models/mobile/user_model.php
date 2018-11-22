@@ -136,7 +136,7 @@ class user_model extends MY_Model
 							);
 
         if($_login_secret === $_system_secret)
-        {
+        {	
 			$this->db->insert('users', $data);
 
 			if($this->db->affected_rows() > 0):
@@ -146,6 +146,7 @@ class user_model extends MY_Model
 
 				mkdir(MAIN_DIR.$userholder.'/Images',0777,true);
 				mkdir(MAIN_DIR.$userholder.'/Videos',0777,true);
+				mkdir(MAIN_DIR.$userholder.'/Promotion',0777,true);
 				return $this->db->insert_id();
 			else:
 				return 0; 
@@ -297,8 +298,8 @@ class user_model extends MY_Model
     	
     	$query = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID' ORDER BY dateadded DESC");
     	$img = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID'");
-    	
-    	if($query->num_rows()){
+    
+	    	if($query->num_rows()){
 
 			$finalImages = [];
 			foreach($query->result() as $data):
@@ -306,6 +307,7 @@ class user_model extends MY_Model
 					'id'		=> $data->id,
 					'file_name' => $data->file_name,
 					'dateadded' => $this->get_real_time($data->dateadded),
+					'status' 	=> $data->status,
 					'imgCount' => $img->num_rows()
 				);
 				array_push($finalImages,$initialImage);
@@ -320,7 +322,8 @@ class user_model extends MY_Model
     	$data = array(
     		'user_id'		=> $user_id,
 			'file_name'		=> $filename,
-			'dateadded'		=> date('Y-m-d H:i:s')
+			'dateadded'		=> date('Y-m-d H:i:s'),
+			'status'		=> 0
 		);
     	$this->db->insert($table, $data);
     }
@@ -348,14 +351,15 @@ class user_model extends MY_Model
     		foreach($query->result() as $data):
 				$initialChats = array(
 					'username' => $data->username,
-					'message'  => $data->message
+					'message'  => $data->message,
+					'count'	   => $query->num_rows()
 				);
 				array_push($finalChats,$initialChats);
 			endforeach;
 			$this->seen_messages($fromTrader,$toTrader);
 			return $finalChats;
     	} else {
-    		return false;
+    		return $query->num_rows();
     	}
     	
     }
@@ -438,17 +442,11 @@ class user_model extends MY_Model
     	}
     }
 
-    public function count_user_uploads($logged_in){
-    	$img = $this->db->query("SELECT * FROM imagefiles where user_id = '$logged_in'");
-    	$vid = $this->db->query("SELECT * FROM videofiles where user_id = '$logged_in'");
-    	$imgCnt = $img->num_rows();
-    	$vidCnt = $vid->num_rows();
+    public function promotionStatus($user_id,$promotion_id,$trigger){
+    	
+    	$promotion_status = $this->db->query("UPDATE video_promotion SET status = '$trigger' WHERE user_id = '$user_id' AND id = '$promotion_id'");
 
-    	$uploadCnt = array(
-    		'imgCount' => $imgCnt,
-    		'vidCount'	=> $vidCnt
-    	);
-    	return $uploadCnt;
+    	
     }
 
     public function get_real_time($timestamp){
