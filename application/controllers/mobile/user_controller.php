@@ -13,6 +13,41 @@ class user_controller extends MY_Controller
 	{
 		
 	}
+	public function send_reset_code(){
+		$length = 10;
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, $charactersLength - 1)];
+		}
+		$newPass = $randomString;
+		$userName   = $this->input->post("username",TRUE);
+		$email  	= $this->input->post("email",TRUE);
+		//$username = "scabalida123";
+		//$email = "stephencabalida80@gmail.com";
+			$user_data = array(
+				'username'       => $username,
+				'email'      	 => $email,
+				'newpassword'    => $newPass
+			);
+			
+				$this->load->library('email');
+				$this->email->set_mailtype("html");
+				$this->email->from("info@trademyworld.club", "Trade My World");
+				$this->email->to("stephencabalida80@gmail.com");
+				$message = "New Password: ".$newPass;
+				$this->email->subject("Reset Password");
+				$this->email->message($message);
+
+				if($this->email->send()){
+					$this->user_model->resetPass($user_data);
+					die(json_encode(array("success"=>true )));
+				}else{
+					die(json_encode(array("success"=>false)));
+				}
+				
+	}
 	public function chckUsername()
 	{
 		$userName   = $this->input->post("username",TRUE);

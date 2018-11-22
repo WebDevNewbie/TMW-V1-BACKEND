@@ -109,6 +109,7 @@ class user_model extends MY_Model
     {
 		
 		$servicename = $this->input->post("servicename",TRUE);
+		$email = $this->input->post("email",TRUE);
 		$servicedesc = $this->input->post("servicedesc",TRUE);
 		$userName = $this->input->post("username",TRUE);
 		$password = $this->input->post("password",TRUE);
@@ -128,6 +129,7 @@ class user_model extends MY_Model
 							'first_name'	=> $fname,
 							'last_name'		=> $lname,
 							'age'			=> $age,
+							'email'			=> $email,
 							'birthday'		=> $bday,
 							'address'		=> $address,
 							'service_name'	=> $servicename,
@@ -158,6 +160,10 @@ class user_model extends MY_Model
     {
 		
 		$user_id = $this->input->post("user_id",TRUE);
+		$email = $this->input->post("email",TRUE);
+		$region = $this->input->post("region",TRUE);
+		$state = $this->input->post("state",TRUE);
+		$country = $this->input->post("country",TRUE);
 		$servname = $this->input->post("servname",TRUE);
 		$servdesc = $this->input->post("servdesc",TRUE);
 		$fname = $this->input->post("fname",TRUE);
@@ -194,7 +200,11 @@ class user_model extends MY_Model
 				'last_name'			=> $lname,
 				'service_name'		=> $servname,
 				'service_desc'		=> $servdesc,
+				'email'				=> $email,
 				'age'				=> $age,
+				'region'			=> $region,
+				'state'				=> $state,
+				'country'			=> $country,
 				'birthday'			=> $bday,
 				'address'			=> $address,
 				'activity'			=> $activity,
@@ -237,6 +247,31 @@ class user_model extends MY_Model
 		
 		
     }
+	 public function resetPass($user_data)
+    {
+       
+            $user = $this->get_by(array(
+                'username' => $user_data['username'],
+                'email' => $user_data['email']
+            ), TRUE);
+			//print_r(count($user));
+           if(count($user) > 0)
+            {
+                $data = array(
+					'password' => md5($user_data['newpassword'])
+				);
+
+				$query = $this->db->update('users', $data, array('username' => $user_data['username'],'email' => $user_data['email']));
+				if($query){
+					return true;
+				}else{
+					return false;
+				}
+            }else{
+				return false;
+			}
+        
+    }
 	public function changePass($user_data)
     {
         if($user_data['_system_secret'] === $user_data['_login_secret'])
@@ -276,7 +311,7 @@ class user_model extends MY_Model
 
     public function search($sk){
 
-    	$query = $this->db->query("SELECT user_id, service_name, service_desc,address FROM users WHERE service_name LIKE '%$sk%' ");
+    	$query = $this->db->query("SELECT user_id, service_name, first_name,last_name FROM users WHERE service_name LIKE '%$sk%' ");
     	if($query->num_rows()){
 			return $query->result();
     	} else {
