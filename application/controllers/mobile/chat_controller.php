@@ -66,6 +66,17 @@ class chat_controller extends MY_Controller
 		die(json_encode(array("success"=>true,"unseen_messages"=>$messCount)));
 	}
 
+	public function display_menu_details(){
+		$loggedId =  $this->input->post('user_id');
+		$details = $this->user_model->get_menu_details($loggedId);
+		if($details != false){
+			die(json_encode(array("success"=>true,"details"=>$details)));
+		} else {
+			die(json_encode(array("success"=>false,"details"=>$details)));
+		}
+		
+	}
+
 	public function fetch_connections(){
 		$loggedId =  $this->input->post('user_id');
 		$result = $this->user_model->all_connections($loggedId);

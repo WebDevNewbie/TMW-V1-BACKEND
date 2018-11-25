@@ -14,6 +14,7 @@ class upload_controller extends MY_Controller
 		$_login_secret    = (string)$this->input->post("loginSecret",TRUE);
 		$encoded_string = $this->input->post("base64",TRUE);
 		$folder = $this->input->post("folder",TRUE);
+		$hasProfileimg = $this->input->post("hasProfileimg",TRUE);
 		$userHolder = $this->input->post("user_id",TRUE);
 		define('MAIN_DIR', $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/');
 		
@@ -23,18 +24,27 @@ class upload_controller extends MY_Controller
 		
 		$file = uniqid() .'.'. $extension;
 		$file_dir = MAIN_DIR . $userHolder .'/'.$folder.'/' . $file;
-		if($folder == 'Images'){
-			$typeOfFile = 'Image';
-			$table = 'imagefiles';
-		} else {
-			$typeOfFile = 'Video';
-			$table = "videofiles";
-		}
+
+		
 		try {
 			file_put_contents($file_dir, $decoded_file);
 			//header('Content-Type: application/json');
-			$this->user_model->saveFile($table,$userHolder,$file);
-			echo json_encode(array("success" => true, "message" => "Trade $typeOfFile successfully Uploaded")); 
+			if($folder == 'Images'){
+				$typeOfFile = 'Trade Image';
+				$table = 'imagefiles';
+				$this->user_model->saveFile($table,$userHolder,$file);
+				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => 'notProfile')); 
+			} else {
+				$typeOfFile = 'Profile Picture';
+				$table = "Profile_images";
+				if($folder == 'Profile_images' && $hasProfileimg == 'no'){
+					$this->insertNewprofileImg($table,$userHolder,$file);
+				} else{
+					$this->updateNewprofileImg($table,$userHolder,$file);
+				}
+				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => $file)); 
+			}
+			
 		} catch (Exception $e) {
 			//header('Content-Type: application/json');
 			echo json_encode(array("success" => false, "message" => $e->getMessage())); 
@@ -49,6 +59,14 @@ class upload_controller extends MY_Controller
 			if(array_search($mime,$value) !== false ) return $key;
 		}
 		return false;
+	}
+
+	public function insertNewprofileImg($table,$userHolder,$file){
+		$this->user_model->saveProfileImg($table,$userHolder,$file);
+	}
+
+	public function updateNewprofileImg($table,$userHolder,$file){
+		$this->user_model->updateProfileImg($table,$userHolder,$file);
 	}
 
 	public function upload_video(){

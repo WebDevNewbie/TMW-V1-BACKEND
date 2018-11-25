@@ -22,15 +22,26 @@ class user_model extends MY_Model
 			$this->db->where('password', md5($login_data['password']));
 			$query = $this->db->get('users');
 			if($query->num_rows()){
+				$finalData = [];
 				foreach ($query->result() as $row)
 				{
-					$data = array(	
-	                    'user_id'   => $row->user_id,
+					$userID = $row->user_id;
+	                $profImg = $this->db->query("SELECT profile_img FROM profile_images WHERE user_id = '$userID'");
+	                if($profImg->num_rows()){
+	                	$img = $profImg->result()[0]->profile_img;
+	                } else {
+	                	$img = 'none';
+	                }
+	                
+	                $initialData = array(
+						 'user_id'   => $row->user_id,
 	                    'username'  => $row->username,
 	                    'user_role'  => $row->user_role,
-	                );
+	                    'face_img'	 => $img
+					);
+					array_push($finalData,$initialData);
 				}
-				return $data;
+				return $finalData;
 			} else {
 				return false;
 			}
@@ -149,6 +160,7 @@ class user_model extends MY_Model
 				mkdir(MAIN_DIR.$userholder.'/Images',0777,true);
 				mkdir(MAIN_DIR.$userholder.'/Videos',0777,true);
 				mkdir(MAIN_DIR.$userholder.'/Promotion',0777,true);
+				mkdir(MAIN_DIR.$userholder.'/Profile_images',0777,true);
 				return $this->db->insert_id();
 			else:
 				return 0; 
@@ -334,7 +346,7 @@ class user_model extends MY_Model
     	$query = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID' ORDER BY dateadded DESC");
     	$img = $this->db->query("SELECT * FROM $table WHERE user_id = '$traderID'");
     
-	    	if($query->num_rows()){
+	    if($query->num_rows()){
 
 			$finalImages = [];
 			foreach($query->result() as $data):
@@ -351,6 +363,24 @@ class user_model extends MY_Model
     	} else {
     		return $img->num_rows();
     	}
+    }
+
+    public function saveProfileImg($table,$user_id,$filename){
+    	$data = array(
+    		'user_id'			=> $user_id,
+			'profile_img'		=> $filename,
+			'dateadded'		=> date('Y-m-d H:i:s')
+		);
+    	$this->db->insert($table, $data);
+    }
+
+    public function updateProfileImg($table,$user_id,$filename){
+    	$data = array(
+	        'profile_img' => $filename,
+		);
+
+		$this->db->where('user_id', $user_id);
+		$this->db->update($table,$data);
     }
 
     public function saveFile($table,$user_id,$filename){
