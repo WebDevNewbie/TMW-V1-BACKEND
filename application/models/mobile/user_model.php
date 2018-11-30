@@ -173,6 +173,7 @@ class user_model extends MY_Model
 		
 		$user_id = $this->input->post("user_id",TRUE);
 		$email = $this->input->post("email",TRUE);
+		$gender = $this->input->post("gender",TRUE);
 		$region = $this->input->post("region",TRUE);
 		$state = $this->input->post("state",TRUE);
 		$country = $this->input->post("country",TRUE);
@@ -214,6 +215,7 @@ class user_model extends MY_Model
 				'service_desc'		=> $servdesc,
 				'email'				=> $email,
 				'age'				=> $age,
+				'gender'			=> $gender,
 				'region'			=> $region,
 				'state'				=> $state,
 				'country'			=> $country,
