@@ -321,11 +321,52 @@ class user_model extends MY_Model
         return hash('sha512', $string . config_item('encryption_key'));
     }
 
-    public function search($sk){
+    public function search($sk,$fromage,$toage,$gender){
+    	$options = '';
+    	if($fromage && $toage){
+    		$options .= "age BETWEEN $fromage AND $toage AND ";
+    	} 
+    	if($gender){
+    		$options .= "gender = $gender AND";
+    	}
 
-    	$query = $this->db->query("SELECT user_id, service_name, first_name,last_name FROM users WHERE service_name LIKE '%$sk%' ");
+    	if(empty($options)) {
+    		$query = $this->db->query("SELECT user_id, age, user_role ,service_name,username,gender FROM users WHERE user_role != 0 AND service_name LIKE '%$sk%' ORDER BY user_role DESC");
+    	} else {
+    		$query = $this->db->query("SELECT user_id, age, user_role ,service_name,username,gender FROM users WHERE user_role != 0 AND $options service_name LIKE '%$sk%' ORDER BY user_role DESC");
+    	}
+
+    	
     	if($query->num_rows()){
-			return $query->result();
+    		$finalResult = [];
+    		foreach ($query->result() as $row) {
+    			$traderID = $row->user_id; 
+    			if($row->user_role != 3){
+    				$getTradeimages = $this->db->query("SELECT file_name FROM imagefiles WHERE user_id = '$traderID' LIMIT 3");
+    				if($getTradeimages->num_rows() == 0){
+    					$assets = 0;
+    				} else {
+    					$assets = $getTradeimages->result();
+    				}
+
+    			} else {
+    				$getPromotionvids = $this->db->query("SELECT file_name FROM video_promotion WHERE user_id = '$traderID'");
+    				if($getPromotionvids->num_rows() == 0){
+    					$assets = 0;
+    				} else {
+    					$assets = $getPromotionvids->result();
+    				}
+    			}
+    			$initResult = array(
+					'user_id'		=> $row->user_id,
+					'username' => $row->username,
+					'service_name' => $row->service_name,
+					'user_role'		=> $row->user_role,
+					'assets' => $assets
+				);
+				array_push($finalResult,$initResult);
+    		}
+			return $finalResult;
     	} else {
     		return false;
     	}
@@ -512,6 +553,10 @@ class user_model extends MY_Model
     	$promotion_status = $this->db->query("UPDATE video_promotion SET status = '$trigger' WHERE user_id = '$user_id' AND id = '$promotion_id'");
 
     	
+    }
+
+    public function startAdvanceSearch(){
+
     }
 
     public function get_real_time($timestamp){

@@ -119,7 +119,10 @@ class user_controller extends MY_Controller
 
 	public function startSearch(){
 		$sk  = $this->input->post("search",TRUE);
-		$data = $this->user_model->search($sk);
+		$fromage = $this->input->post("fromage",TRUE);
+		$toage = $this->input->post("toage",TRUE);
+		$gender = $this->input->post("gender",TRUE);
+		$data = $this->user_model->search($sk,$fromage,$toage,$gender);
 
 		if($data != false){
 			die(json_encode(array("success"=>true,"search_result"=>$data)));
@@ -127,6 +130,11 @@ class user_controller extends MY_Controller
 			die(json_encode(array("error"=>true,"search_result"=>$data)));
 		}
 
+	}
+
+	public function advancedSearch(){
+		
+		$data = $this->user_model->search($sk,$fromage,$toage);
 	}	
 	
 }
