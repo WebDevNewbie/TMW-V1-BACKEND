@@ -36,7 +36,7 @@ class upload_controller extends MY_Controller
 				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => 'notProfile')); 
 			} else {
 				$typeOfFile = 'Profile Picture';
-				$table = "Profile_images";
+				$table = "profile_images";
 				if($folder == 'Profile_images' && $hasProfileimg == 'no'){
 					$this->insertNewprofileImg($table,$userHolder,$file);
 				} else{
@@ -74,7 +74,7 @@ class upload_controller extends MY_Controller
 		$location = $this->input->post('location');
 		$table = $this->input->post('table');
 		$target_path = $_SERVER['DOCUMENT_ROOT'].'/tradeappbackend/public_html/MediaFiles/'.$user_id.'/'.$location.'/'. basename( $_FILES['file']['name']);
-		if($table == "videofile"){
+		if($table == "videofiles"){
 			$type = 'Trade Video';
 		}else{
 			$type = 'Promotion Video';

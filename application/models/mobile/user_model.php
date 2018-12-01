@@ -130,6 +130,7 @@ class user_model extends MY_Model
 		$bday = $this->input->post("bday",TRUE);
 		$address = $this->input->post("address",TRUE);
 		$user_role = $this->input->post("package",TRUE);
+		$gender = $this->input->post("gender",TRUE);
 		$_login_secret    = (string)$this->input->post("loginSecret",TRUE);
 
 		$_system_secret = '0ff9346b4edc8dc033bff30762bc3c15d465d3f';
@@ -145,7 +146,8 @@ class user_model extends MY_Model
 							'address'		=> $address,
 							'service_name'	=> $servicename,
 							'service_desc'	=> $servicedesc,
-							'user_role' 	=> $user_role
+							'user_role' 	=> $user_role,
+							'gender'		=> $gender
 							);
 
         if($_login_secret === $_system_secret)
@@ -352,7 +354,7 @@ class user_model extends MY_Model
     				}
 
     			} else {
-    				$getPromotionvids = $this->db->query("SELECT file_name FROM video_promotion WHERE user_id = '$traderID'");
+    				$getPromotionvids = $this->db->query("SELECT file_name FROM video_promotion WHERE user_id = '$traderID' and status = 0");
     				if($getPromotionvids->num_rows() == 0){
     					$assets = 0;
     				} else {
