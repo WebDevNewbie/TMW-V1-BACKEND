@@ -32,17 +32,23 @@ class upload_controller extends MY_Controller
 			if($folder == 'Images'){
 				$typeOfFile = 'Trade Image';
 				$table = 'imagefiles';
-				$this->user_model->saveFile($table,$userHolder,$file);
-				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => 'notProfile')); 
+				$upload = $this->user_model->saveFile($table,$userHolder,$file);
+				if($upload){
+				    echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => 'notProfile'));
+				}else{
+				    echo json_encode(array("success" => false, "message" => $upload,"file" => 'notProfile'));
+				}
 			} else {
 				$typeOfFile = 'Profile Picture';
 				$table = "profile_images";
 				if($folder == 'Profile_images' && $hasProfileimg == 'no'){
 					$this->insertNewprofileImg($table,$userHolder,$file);
+					$status = 'Uploaded!';
 				} else{
 					$this->updateNewprofileImg($table,$userHolder,$file);
+					$status = 'Updated!';
 				}
-				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully Uploaded","file" => $file)); 
+				echo json_encode(array("success" => true, "message" => "$typeOfFile successfully $status","file" => $file)); 
 			}
 			
 		} catch (Exception $e) {

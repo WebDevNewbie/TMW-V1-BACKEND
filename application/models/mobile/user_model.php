@@ -435,7 +435,12 @@ class user_model extends MY_Model
 			'dateadded'		=> date('Y-m-d H:i:s'),
 			'status'		=> 0
 		);
-    	$this->db->insert($table, $data);
+    	$query = $this->db->insert($table, $data);
+    	if($query){
+    		return true;
+    	}else{
+    		return false;
+    	}
     }
 
     public function deleteFile($table,$img_id){
