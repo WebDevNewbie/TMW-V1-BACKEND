@@ -9,13 +9,29 @@ class chat_controller extends MY_Controller
 		$this->load->model("mobile/user_model");
 	}
 
+	// public function insert_chat(){
+
+	// 	$fromTrader = $this->input->post('fromTrader');
+	// 	$toTrader = $this->input->post('toTrader');
+	// 	$chatMessage = $this->input->post('chatMessage');
+
+	// 	$this->user_model->sendMessage($fromTrader,$toTrader,$chatMessage);
+	// 	$data = $this->user_model->fetchChatMessages($fromTrader,$toTrader);
+	// 	if($data != 0){
+	// 		die(json_encode(array("success"=>true,"chat_messages"=>$data)));
+	// 	}else{
+	// 		die(json_encode(array("success"=>false,"chat_messages"=>null)));
+	// 	}
+		
+	// }
 	public function insert_chat(){
 
 		$fromTrader = $this->input->post('fromTrader');
 		$toTrader = $this->input->post('toTrader');
 		$chatMessage = $this->input->post('chatMessage');
+		$chat_room = $this->input->post('chat_room');
 
-		$this->user_model->sendMessage($fromTrader,$toTrader,$chatMessage);
+		$this->user_model->sendMessage($fromTrader,$toTrader,$chatMessage,$chat_room);
 		$data = $this->user_model->fetchChatMessages($fromTrader,$toTrader);
 		if($data != 0){
 			die(json_encode(array("success"=>true,"chat_messages"=>$data)));
@@ -24,7 +40,7 @@ class chat_controller extends MY_Controller
 		}
 		
 	}
-
+	
 	public function fetch_messages(){
 		$fromTrader = $this->input->post('fromTrader');
 		$toTrader = $this->input->post('toTrader');
@@ -37,10 +53,22 @@ class chat_controller extends MY_Controller
 		}
 	}
 
+	// public function latest_chat_message(){
+	// 	$logged_id = $this->input->post('logged_id');
+	// 	$fromTrader = $this->input->post('sender_id');
+	// 	$data = $this->user_model->get_retrieved_message($logged_id,$fromTrader);
+	// 	if($data != false){
+	// 		die(json_encode(array("success"=>true,"new_message"=>$data)));
+	// 	}else{
+	// 		die(json_encode(array("success"=>true,"new_message"=>null)));
+	// 	}
+	// }
+
 	public function latest_chat_message(){
-		$loggged_id = $this->input->post('loggged_id');
-		$toTrader = $this->input->post('toTrader');
-		$data = $this->user_model->get_retrieved_message($loggged_id,$toTrader);
+		$logged_id = $this->input->post('logged_id');
+		// $fromTrader = $this->input->post('sender_id');
+		$chat_room = $this->input->post('chat_room');
+		$data = $this->user_model->get_retrieved_message($logged_id,$chat_room);
 		if($data != false){
 			die(json_encode(array("success"=>true,"new_message"=>$data)));
 		}else{

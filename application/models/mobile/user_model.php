@@ -345,6 +345,12 @@ class user_model extends MY_Model
     		$finalResult = [];
     		foreach ($query->result() as $row) {
     			$traderID = $row->user_id; 
+    			$face_img = $this->db->query("SELECT profile_img FROM profile_images WHERE user_id = '$traderID'");
+    			if($face_img->num_rows() > 0 ){
+    				$has_faceImg = $face_img->result()[0]->profile_img;
+    			} else {
+    				$has_faceImg = 'none';
+    			}
     			if($row->user_role != 3){
     				$getTradeimages = $this->db->query("SELECT file_name FROM imagefiles WHERE user_id = '$traderID' LIMIT 3");
     				if($getTradeimages->num_rows() == 0){
@@ -363,6 +369,7 @@ class user_model extends MY_Model
     			}
     			$initResult = array(
 					'user_id'		=> $row->user_id,
+					'face_img'		=> $has_faceImg,
 					'username' => $row->username,
 					'service_name' => $row->service_name,
 					'user_role'		=> $row->user_role,
@@ -447,8 +454,20 @@ class user_model extends MY_Model
     	$this->db->delete($table, array('id' => $img_id));
     }
 
-    public function sendMessage($fromTrader,$toTrader,$message){
+  //   public function sendMessage($fromTrader,$toTrader,$message){
+  //   	$data = array(
+  //   		'from_trader'		=> $fromTrader,
+		// 	'to_trader'		=> $toTrader,
+		// 	'message'		=> $message,
+		// 	'datesent'		=> date('Y-m-d H:i:s'),
+		// 	'status'			=> 0
+		// );
+
+  //   	$this->db->insert('chat_messages', $data);
+  //   }
+    public function sendMessage($fromTrader,$toTrader,$message,$chat_room){
     	$data = array(
+    		'chat_room_id'		=> $chat_room,
     		'from_trader'		=> $fromTrader,
 			'to_trader'		=> $toTrader,
 			'message'		=> $message,
@@ -458,13 +477,24 @@ class user_model extends MY_Model
 
     	$this->db->insert('chat_messages', $data);
     }
-
+    // INNER JOIN profile_images t3 ON t3.user_id = t2.from_trader OR t3.user_id = t2.to_trader
     public function fetchChatMessages($fromTrader,$toTrader){
-    	$query = $this->db->query("SELECT user_id, username, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE (o.from_trader = '$fromTrader' AND o.to_trader = '$toTrader') OR (o.from_trader = '$toTrader' AND o.to_trader = '$fromTrader') ORDER BY datesent DESC");
+    	$query = $this->db->query("SELECT * FROM users t1 
+    		INNER JOIN chat_messages t2 ON t2.from_trader = t1.user_id
+    		WHERE (t2.from_trader = '$fromTrader' AND t2.to_trader = '$toTrader') OR (t2.from_trader = '$toTrader' AND t2.to_trader = '$fromTrader') ORDER BY datesent DESC");
     	if($query->num_rows()){
     		$finalChats = [];
     		foreach($query->result() as $data):
+    			$userID = $data->user_id;
+    			$getFaceimg =  $this->db->query("SELECT profile_img FROM profile_images WHERE user_id ='$userID'");
+    			if($getFaceimg->num_rows() > 0){
+    				$Faceimg = $getFaceimg->result()[0]->profile_img;
+    			} else {
+    				$Faceimg = 'none';
+    			}
 				$initialChats = array(
+					'user_id'	=> $data->user_id,
+					'face_img'	=> $Faceimg,
 					'username' => $data->username,
 					'message'  => $data->message,
 					'count'	   => $query->num_rows()
@@ -479,15 +509,53 @@ class user_model extends MY_Model
     	
     }
 
-    public function get_retrieved_message($logged_id){
+  //   public function get_retrieved_message($logged_id,$sender_id){
 		
-		$message = $this->db->query("SELECT id,username, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE o.to_trader = '$logged_id' AND status = 0 ORDER BY o.id DESC LIMIT 1");
+		// $message = $this->db->query("SELECT *, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE o.to_trader = '$logged_id' AND o.from_trader = '$sender_id' ORDER BY datesent ASC LIMIT 1");
+    	
+  //   	if($message->num_rows()){
+  //   		$finalMessage = [];
+  //   		foreach($message->result() as $data):
+  //   			$avatar_id = $data->user_id;
+  //   			$getavatarImg =  $this->db->query("SELECT profile_img FROM profile_images WHERE user_id ='$avatar_id'");
+  //   			if($getavatarImg->num_rows() > 0){
+  //   				$avatarImg = $getavatarImg->result()[0]->profile_img;
+  //   			} else {
+  //   				$avatarImg = 'none';
+  //   			}
+		// 		$initialMessage = array(
+		// 			'chat_id'  => $data->id,
+		// 			'face_img'	=> $avatarImg,
+		// 			'user_id'	=> $data->user_id,
+		// 			'username' => $data->username,
+		// 			'message'  => $data->message
+		// 		);
+		// 		array_push($finalMessage,$initialMessage);
+		// 	endforeach;
+		// 	return $finalMessage;
+  //   	} else {
+  //   		return false;
+  //   	}
+  //   }
+
+    public function get_retrieved_message($logged_id,$chat_room){
+		
+		$message = $this->db->query("SELECT *, message FROM users c INNER JOIN chat_messages o on o.from_trader = c.user_id WHERE o.to_trader = '$logged_id' AND o.chat_room_id = '$chat_room' AND status = 0 ORDER BY o.id DESC LIMIT 1");
     	
     	if($message->num_rows()){
     		$finalMessage = [];
     		foreach($message->result() as $data):
+    			$avatar_id = $data->user_id;
+    			$getavatarImg =  $this->db->query("SELECT profile_img FROM profile_images WHERE user_id ='$avatar_id'");
+    			if($getavatarImg->num_rows() > 0){
+    				$avatarImg = $getavatarImg->result()[0]->profile_img;
+    			} else {
+    				$avatarImg = 'none';
+    			}
 				$initialMessage = array(
 					'chat_id'  => $data->id,
+					'face_img'	=> $avatarImg,
+					'user_id'	=> $data->user_id,
 					'username' => $data->username,
 					'message'  => $data->message
 				);
@@ -529,12 +597,54 @@ class user_model extends MY_Model
     	$query = $this->db->query("UPDATE chat_messages SET status = 1 WHERE from_trader = '$toTrader' AND to_trader = '$fromTrader' AND status = 0");
     }
 
+   //  public function all_connections($loggedInid){
+   //  	$query = $this->db->query("SELECT DISTINCT from_trader FROM chat_messages WHERE to_trader = '$loggedInid'");
+   //  	$finalNames = [];
+   //  	if($query->num_rows()){
+			// foreach($query->result() as $data):
+			// 	$fromID = $data->from_trader;
+   //  			$getFaceimg =  $this->db->query("SELECT profile_img FROM profile_images WHERE user_id ='$fromID'");
+   //  			if($getFaceimg->num_rows() > 0){
+   //  				$Faceimg = $getFaceimg->result()[0]->profile_img;
+   //  			} else {
+   //  				$Faceimg = 'none';
+   //  			}
+			// 	$get = $this->db->query("SELECT user_id,username FROM users WHERE user_id = '$fromID'");
+			// 	foreach ($get->result() as $names) {
+			// 		$sender = $names->user_id;
+			// 		$chat_count = $this->db->query("SELECT * FROM chat_messages WHERE from_trader = '$sender' AND to_trader = '$loggedInid' AND status = 0");
+			// 		$unseen_count = $chat_count->num_rows();
+			// 		$get_last_message = $this->db->query("SELECT message FROM chat_messages WHERE from_trader = '$sender' AND to_trader = '$loggedInid' ORDER BY datesent DESC LIMIT 1 ");
+			// 		$last_message = $get_last_message->result()[0]->message;
+			// 		$initialNames = array(
+			// 			'user_id'	=> $names->user_id,
+			// 			'face_img'	=> $Faceimg,
+			// 			'username' => $names->username,
+			// 			'unseen_chat' =>$unseen_count,
+			// 			'last_message' => $last_message
+			// 		);
+			// 		array_push($finalNames,$initialNames);
+			// 	}
+			// endforeach;
+			// return $finalNames;
+   //  	} else {
+   //  		return false;
+   //  	}
+   //  }
+    
     public function all_connections($loggedInid){
-    	$query = $this->db->query("SELECT DISTINCT from_trader FROM chat_messages WHERE to_trader = '$loggedInid'");
+    	$query = $this->db->query("SELECT DISTINCT chat_room_id,from_trader FROM chat_messages WHERE to_trader = '$loggedInid'");
     	$finalNames = [];
     	if($query->num_rows()){
 			foreach($query->result() as $data):
+				$chat_room = $data->chat_room_id;
 				$fromID = $data->from_trader;
+    			$getFaceimg =  $this->db->query("SELECT profile_img FROM profile_images WHERE user_id ='$fromID'");
+    			if($getFaceimg->num_rows() > 0){
+    				$Faceimg = $getFaceimg->result()[0]->profile_img;
+    			} else {
+    				$Faceimg = 'none';
+    			}
 				$get = $this->db->query("SELECT user_id,username FROM users WHERE user_id = '$fromID'");
 				foreach ($get->result() as $names) {
 					$sender = $names->user_id;
@@ -543,7 +653,9 @@ class user_model extends MY_Model
 					$get_last_message = $this->db->query("SELECT message FROM chat_messages WHERE from_trader = '$sender' AND to_trader = '$loggedInid' ORDER BY datesent DESC LIMIT 1 ");
 					$last_message = $get_last_message->result()[0]->message;
 					$initialNames = array(
+						'chat_room_id'	=> $chat_room,
 						'user_id'	=> $names->user_id,
+						'face_img'	=> $Faceimg,
 						'username' => $names->username,
 						'unseen_chat' =>$unseen_count,
 						'last_message' => $last_message
@@ -558,7 +670,7 @@ class user_model extends MY_Model
     }
 
     public function promotionStatus($user_id,$promotion_id,$trigger){
-    	
+    	 
     	$promotion_status = $this->db->query("UPDATE video_promotion SET status = '$trigger' WHERE user_id = '$user_id' AND id = '$promotion_id'");
 
     	
